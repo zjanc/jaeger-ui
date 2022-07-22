@@ -1,13 +1,14 @@
 import * as React from 'react';
 import { connect } from "react-redux";
 import { ReduxState } from "../../../types";
+import PropTypes from 'prop-types';
 // @ts-ignore
 import store from 'store';
 // @ts-ignore
 import { Field, formValueSelector, reduxForm } from 'redux-form';
 import { Col, Row } from 'antd';
-import { ActionFunction, Action } from 'redux-actions';
-import { trackSelectService } from '../../Monitor/ServicesView/index.track';
+import { ActionFunction, Action, ActionMeta } from 'redux-actions';
+import { trackSearchOperation, trackSelectService } from '../../Monitor/ServicesView/index.track';
 import reduxFormFieldAdapter from '../../../utils/redux-form-field-adapter';
 import VirtSelect from '../../common/VirtSelect';
 import { bindActionCreators, Dispatch } from 'redux';
@@ -24,6 +25,7 @@ type TReduxProps = {
 };
 type TDispatchProps = {
   fetchServices: ActionFunction<Action<Promise<any>>>;
+  fetchServiceOperations: (serviceName: string) => void;
 };
 
 type TProps = TReduxProps & TDispatchProps;
@@ -45,6 +47,13 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
     fetchServices();
   }
 
+  componentDidUpdate(prevProps: TProps) {
+    const { fetchServiceOperations, selectedService } = this.props;
+    if (selectedService && prevProps.selectedService !== selectedService) {
+      fetchServiceOperations(selectedService);
+    }
+  }
+
   fetchAnalysis() {
   }
 
@@ -59,13 +68,13 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
   }
 
   render() {
-    const { services, servicesLoading, selectedService } = this.props;
+    const { services, operationsForService, servicesLoading, selectedService, selectedOperation } = this.props;
     return (
       <>
         <div className="critical-path-container">
           <Row>
             <Col span={16}>
-              <h1>Test Critical Path Page</h1>
+              <h1>Critical Path page for {selectedService} / {selectedOperation}</h1>
             </Col>
           </Row>
 
@@ -73,7 +82,7 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
             <Col span={6}>
               <h2 className="service-selector-header">Choose service</h2>
               <Field
-                onChange={(e: Event, newValue: string) => trackSelectService(newValue)}
+                // onChange={(e: Event, newValue: string) => trackSelectService(newValue)}
                 name="service"
                 component={AdaptedVirtualSelect}
                 placeholder="Select A Service"
@@ -87,7 +96,25 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
                 }}
               />
             </Col>
+            <Col span={6}>
+              <h2 className="operation-selector-header">Choose operation</h2>
+              <Field
+                // onChange={(e: Event, newValue: string) => trackSearchOperation(newValue)}
+                name="operation"
+                component={AdaptedVirtualSelect}
+                placeholder="Select an Operation"
+                props={{
+                  className: 'select-a-operation-input',
+                  value: this.getSelectedOperation(),
+                  disabled: servicesLoading,
+                  clearable: false,
+                  options: operationsForService[selectedService] ? operationsForService[selectedService].map((s: string) => ({ label: s, value: s })) : [],
+                  required: true,
+                }}
+              />
+            </Col>
           </Row>
+
         </div>
       </>
     )
@@ -106,13 +133,14 @@ export function mapStateToProps(state: ReduxState): TReduxProps {
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ReduxState>): TDispatchProps {
-  const { fetchServices } = bindActionCreators<any>(
+  const { fetchServices, fetchServiceOperations } = bindActionCreators<any>(
     jaegerApiActions,
     dispatch
   );
 
   return {
     fetchServices,
+    fetchServiceOperations,
   }
 }
 
