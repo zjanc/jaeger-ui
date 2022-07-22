@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { Dispatch } from "react";
 import { connect } from "react-redux";
 import { ReduxState } from "../../../types";
 // @ts-ignore
@@ -7,9 +6,13 @@ import store from 'store';
 // @ts-ignore
 import { Field, formValueSelector, reduxForm } from 'redux-form';
 import { Col, Row } from 'antd';
+import { ActionFunction, Action } from 'redux-actions';
 import { trackSelectService } from '../../Monitor/ServicesView/index.track';
 import reduxFormFieldAdapter from '../../../utils/redux-form-field-adapter';
 import VirtSelect from '../../common/VirtSelect';
+import { bindActionCreators, Dispatch } from 'redux';
+
+import * as jaegerApiActions from '../../../actions/jaeger-api';
 
 type StateType = {};
 type TReduxProps = {
@@ -19,7 +22,9 @@ type TReduxProps = {
   selectedService: string;
   selectedOperation: string;
 };
-type TDispatchProps = {};
+type TDispatchProps = {
+  fetchServices: ActionFunction<Action<Promise<any>>>;
+};
 
 type TProps = TReduxProps & TDispatchProps;
 
@@ -33,6 +38,11 @@ const AdaptedVirtualSelect = reduxFormFieldAdapter({
 export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType> {
   constructor(props: TProps) {
     super(props);
+  }
+
+  componentDidMount() {
+    const { fetchServices, services } = this.props;
+    fetchServices();
   }
 
   fetchAnalysis() {
@@ -96,7 +106,14 @@ export function mapStateToProps(state: ReduxState): TReduxProps {
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ReduxState>): TDispatchProps {
-  return {}
+  const { fetchServices } = bindActionCreators<any>(
+    jaegerApiActions,
+    dispatch
+  );
+
+  return {
+    fetchServices,
+  }
 }
 
 export default connect(
