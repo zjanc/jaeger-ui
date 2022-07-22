@@ -34,6 +34,8 @@ import TracePage from '../TracePage';
 import { ROUTE_PATH as tracePath } from '../TracePage/url';
 import MonitorATMPage from '../Monitor';
 import { ROUTE_PATH as monitorATMPath } from '../Monitor/url';
+import CriticalPathPage from '../CriticalPath';
+import { ROUTE_PATH as criticalAnalysisPath } from '../CriticalPath/url';
 import JaegerAPI, { DEFAULT_API_ROOT } from '../../api/jaeger';
 import configureStore from '../../utils/configure-store';
 import processScripts from '../../utils/config/process-scripts';
@@ -66,6 +68,7 @@ export default class JaegerUIApp extends Component {
               <Route path={deepDependenciesPath} component={DeepDependencies} />
               <Route path={qualityMetricsPath} component={QualityMetrics} />
               <Route path={monitorATMPath} component={MonitorATMPage} />
+              <Route path={criticalAnalysisPath} component={CriticalPathPage} />
 
               <Redirect exact path="/" to={searchPath} />
               <Redirect exact path={prefixUrl()} to={searchPath} />

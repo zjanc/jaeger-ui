@@ -25,6 +25,7 @@ import * as qualityMetrics from '../QualityMetrics/url';
 import * as searchUrl from '../SearchTracePage/url';
 import * as diffUrl from '../TraceDiff/url';
 import * as monitorATMUrl from '../Monitor/url';
+import * as criticalPathUrl from '../CriticalPath/url';
 import { ReduxState } from '../../types';
 import { ConfigMenuItem, ConfigMenuGroup } from '../../types/config';
 import { getConfigValue } from '../../utils/config/get-config';
@@ -43,6 +44,11 @@ const NAV_LINKS = [
     matches: diffUrl.matches,
     text: 'Compare',
   },
+  {
+    to: criticalPathUrl.getUrl(),
+    matches: criticalPathUrl.matches,
+    text: 'Analysis'
+  }
 ];
 
 if (getConfigValue('dependencies.menuEnabled')) {
