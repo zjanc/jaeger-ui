@@ -137,7 +137,7 @@ export class SearchTracePageImpl extends Component {
         )}
         <Col span={!embedded ? 18 : 24} className="SearchTracePage--column">
           {hasCRISPReport && flameGraphEnabled && (
-            <div dangerouslySetInnerHTML={{ __html: crispRaw.flameGraph.replace("/\\n/g", "") }} />
+            <div dangerouslySetInnerHTML={{ __html: crispRaw.flameGraph.replace("/\\n/g", "") }} className="flame-graph" />
           )}
           {hasCRISPReport && heatmapEnabled && (
             <div dangerouslySetInnerHTML={{ __html: crispRaw.heatmap.replace("/\\n/g", "") }} />

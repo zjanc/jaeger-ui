@@ -44,3 +44,21 @@ limitations under the License.
   display: block;
   margin: 13rem auto 0 auto;
 }
+
+.flame-graph svg {
+  width: 100%;
+  border: 1px solid #e6e6e6;
+  margin-bottom: 20px;
+}
+
+svg>rect {
+  fill: white;
+  width: 100%;
+}
+
+.flame-graph h2 {
+  background-color: #f5f5f5;
+  border: 1px solid #e6e6e6;
+  padding: 1rem;
+  margin: 0px;
+}
