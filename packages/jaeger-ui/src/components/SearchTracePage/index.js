@@ -91,6 +91,7 @@ export class SearchTracePageImpl extends Component {
 
   render() {
     const {
+      crispRaw,
       cohortAddTrace,
       cohortRemoveTrace,
       diffCohort,
@@ -101,15 +102,19 @@ export class SearchTracePageImpl extends Component {
       loadingTraces,
       maxTraceDuration,
       services,
-      rawTraces,
       traceResults,
       queryOfResults,
       loadJsonTraces,
       urlQueryParams,
     } = this.props;
     const hasTraceResults = traceResults && traceResults.length > 0;
+    const hasCRISPReport = crispRaw;
     const showErrors = errors && !loadingTraces;
     const showLogo = isHomepage && !hasTraceResults && !loadingTraces && !errors;
+
+    const flameGraphEnabled = true;
+    const heatmapEnabled = false;
+    const summaryEnabled = false;
     return (
       <Row className="SearchTracePage--row">
         {!embedded && (
@@ -131,11 +136,14 @@ export class SearchTracePageImpl extends Component {
           </Col>
         )}
         <Col span={!embedded ? 18 : 24} className="SearchTracePage--column">
-          {hasTraceResults && (
-            <>
-              <h1> hello </h1>
-              <code>{JSON.stringify(rawTraces)}</code>
-            </>
+          {hasCRISPReport && flameGraphEnabled && (
+            <div dangerouslySetInnerHTML={{ __html: crispRaw.flameGraph.replace("/\\n/g", "") }} />
+          )}
+          {hasCRISPReport && heatmapEnabled && (
+            <div dangerouslySetInnerHTML={{ __html: crispRaw.heatmap.replace("/\\n/g", "") }} />
+          )}
+          {hasCRISPReport && summaryEnabled && (
+            <div dangerouslySetInnerHTML={{ __html: crispRaw.summary.replace("/\\n/g", "") }} />
           )}
           {showErrors && (
             <div className="js-test-error-message">
@@ -177,6 +185,8 @@ export class SearchTracePageImpl extends Component {
 }
 SearchTracePageImpl.propTypes = {
   isHomepage: PropTypes.bool,
+  // eslint-disable-next-line react/forbid-prop-types
+  crispRaw: PropTypes.object,
   // eslint-disable-next-line react/forbid-prop-types
   rawTraces: PropTypes.array,
   // eslint-disable-next-line react/forbid-prop-types
@@ -263,6 +273,7 @@ const stateServicesXformer = memoizeOne(stateServices => {
 export function mapStateToProps(state) {
   const { embedded, router, services: stServices, traceDiff, trace } = state;
   const rawTraces = trace.rawTraces;
+  const crispRaw = trace.crispRaw;
   const query = getUrlState(router.location.search);
   const isHomepage = !Object.keys(query).length;
   const { query: queryOfResults, traces, maxDuration, traceError, loadingTraces } = stateTraceXformer(
@@ -280,6 +291,7 @@ export function mapStateToProps(state) {
   const sortBy = sortFormSelector(state, 'sortBy');
   const traceResults = sortedTracesXformer(traces, sortBy);
   return {
+    crispRaw,
     queryOfResults,
     diffCohort,
     embedded,

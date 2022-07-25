@@ -178,11 +178,6 @@ export class UnconnectedSearchResults extends React.PureComponent<SearchResultsP
               />
             </div>
           )}
-          {!hideGraph && traceResultsView && (
-            <div className="ub-p3 SearchResults--headerScatterPlot">
-              <h2>Flame Graph</h2>
-            </div>
-          )}
           <div className="SearchResults--headerOverview">
             <h2 className="ub-m0 u-flex-1">
               {traces.length} Trace{traces.length > 1 && 's'}
