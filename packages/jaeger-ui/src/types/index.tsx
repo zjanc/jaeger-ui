@@ -60,6 +60,7 @@ export type ReduxState = {
     loading: boolean;
     error: ApiError | TNil;
   };
+  rawTraces: any;
   trace: {
     traces: Record<string, FetchedTrace>;
     search: {
@@ -69,6 +70,12 @@ export type ReduxState = {
       query?: SearchQuery;
     };
   };
+  crisp: {
+    flameGraph: string,
+    heatMap: string,
+    summary: string,
+  }
+  crispRaw: any,
   traceDiff: TTraceDiffState;
   traceTimeline: TTraceTimeline;
   metrics: MetricsReduxState;

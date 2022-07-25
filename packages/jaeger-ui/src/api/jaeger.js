@@ -35,7 +35,9 @@ export function getMessageFromError(errData, status) {
 
 function getJSON(url, options = {}) {
   const { query = null, ...init } = options;
-  init.credentials = 'same-origin';
+  if (url !== "http://localhost:3000/report") {
+    init.credentials = 'same-origin';
+  }
   let queryStr = '';
 
   if (query) {
@@ -123,6 +125,17 @@ const JaegerAPI = {
     return getJSON(`${this.apiRoot}metrics/${metricType}`, {
       query: `${servicesName}&${queryString.stringify(query)}`,
     }).then(d => ({ ...d, quantile: query.quantile }));
+  },
+  fetchCRISPAnalysis(serviceName, operationName, traces) {
+    // Change apiRoot into the CRISP webserver address
+    return getJSON(`http://localhost:5000/report`, {
+      body: JSON.stringify(traces),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: 'POST',
+      query: `service=${serviceName}&operation=${operationName}`
+    });
   },
 };
 

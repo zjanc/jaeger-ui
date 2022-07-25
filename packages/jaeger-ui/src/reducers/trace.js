@@ -15,7 +15,7 @@
 import _isEqual from 'lodash/isEqual';
 import { handleActions } from 'redux-actions';
 
-import { fetchTrace, fetchMultipleTraces, searchTraces } from '../actions/jaeger-api';
+import { fetchTrace, fetchMultipleTraces, searchTraces, fetchCRISPAnalysis } from '../actions/jaeger-api';
 import { loadJsonTraces } from '../actions/file-reader-api';
 import { fetchedState } from '../constants';
 import transformTraceData from '../model/transform-trace-data';
@@ -114,7 +114,8 @@ function searchDone(state, { meta, payload }) {
   }
   const traces = { ...state.traces, ...resultTraces };
   const search = { ...state.search, results, state: fetchedState.DONE };
-  return { ...state, search, traces };
+  const rawTraces = payload.data;
+  return { ...state, search, traces, rawTraces };
 }
 
 function searchErred(state, { meta, payload }) {
@@ -150,6 +151,19 @@ function loadJsonErred(state, { payload }) {
   return { ...state, search };
 }
 
+function fetchCRISPStarted(state) {
+  return state;
+}
+
+function fetchCRISPDone(state, { payload }) {
+  const crispRaw = payload;
+  return { ...state, crispRaw }
+}
+
+function fetchCRISPErred(state) {
+  return state;
+}
+
 export default handleActions(
   {
     [`${fetchTrace}_PENDING`]: fetchTraceStarted,
@@ -167,6 +181,10 @@ export default handleActions(
     [`${loadJsonTraces}_PENDING`]: loadJsonStarted,
     [`${loadJsonTraces}_FULFILLED`]: loadJsonDone,
     [`${loadJsonTraces}_REJECTED`]: loadJsonErred,
+
+    [`${fetchCRISPAnalysis}_PENDING`]: fetchCRISPStarted,
+    [`${fetchCRISPAnalysis}_FULFILLED`]: fetchCRISPDone,
+    [`${fetchCRISPAnalysis}_REJECTED`]: fetchCRISPErred,
   },
   initialState
 );

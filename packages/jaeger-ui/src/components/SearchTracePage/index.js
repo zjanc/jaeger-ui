@@ -71,6 +71,18 @@ export class SearchTracePageImpl extends Component {
     }
   }
 
+  componentDidUpdate(prevProps) {
+    const {
+      fetchCRISPAnalysis,
+      rawTraces,
+      urlQueryParams
+    } = this.props;
+    if (rawTraces && prevProps.rawTraces !== rawTraces) {
+      const wrappedData = { data: rawTraces }
+      fetchCRISPAnalysis(urlQueryParams.service, "operation" in urlQueryParams ? urlQueryParams.operation : "all", wrappedData)
+    }
+  }
+
   goToTrace = traceID => {
     const { queryOfResults } = this.props;
     const searchUrl = queryOfResults ? getUrl(stripEmbeddedState(queryOfResults)) : getUrl();
@@ -89,6 +101,7 @@ export class SearchTracePageImpl extends Component {
       loadingTraces,
       maxTraceDuration,
       services,
+      rawTraces,
       traceResults,
       queryOfResults,
       loadJsonTraces,
@@ -118,6 +131,12 @@ export class SearchTracePageImpl extends Component {
           </Col>
         )}
         <Col span={!embedded ? 18 : 24} className="SearchTracePage--column">
+          {hasTraceResults && (
+            <>
+              <h1> hello </h1>
+              <code>{JSON.stringify(rawTraces)}</code>
+            </>
+          )}
           {showErrors && (
             <div className="js-test-error-message">
               <h2>There was an error querying for traces:</h2>
@@ -159,6 +178,8 @@ export class SearchTracePageImpl extends Component {
 SearchTracePageImpl.propTypes = {
   isHomepage: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
+  rawTraces: PropTypes.array,
+  // eslint-disable-next-line react/forbid-prop-types
   traceResults: PropTypes.array,
   // eslint-disable-next-line react/forbid-prop-types
   diffCohort: PropTypes.array,
@@ -191,6 +212,7 @@ SearchTracePageImpl.propTypes = {
   fetchMultipleTraces: PropTypes.func,
   fetchServiceOperations: PropTypes.func,
   fetchServices: PropTypes.func,
+  fetchCRISPAnalysis: PropTypes.func,
   errors: PropTypes.arrayOf(
     PropTypes.shape({
       message: PropTypes.string,
@@ -239,7 +261,8 @@ const stateServicesXformer = memoizeOne(stateServices => {
 
 // export to test
 export function mapStateToProps(state) {
-  const { embedded, router, services: stServices, traceDiff } = state;
+  const { embedded, router, services: stServices, traceDiff, trace } = state;
+  const rawTraces = trace.rawTraces;
   const query = getUrlState(router.location.search);
   const isHomepage = !Object.keys(query).length;
   const { query: queryOfResults, traces, maxDuration, traceError, loadingTraces } = stateTraceXformer(
@@ -264,6 +287,8 @@ export function mapStateToProps(state) {
     loadingServices,
     loadingTraces,
     services,
+    rawTraces,
+    traces,
     traceResults,
     errors: errors.length ? errors : null,
     maxTraceDuration: maxDuration,
@@ -273,7 +298,7 @@ export function mapStateToProps(state) {
 }
 
 function mapDispatchToProps(dispatch) {
-  const { fetchMultipleTraces, fetchServiceOperations, fetchServices, searchTraces } = bindActionCreators(
+  const { fetchMultipleTraces, fetchServiceOperations, fetchServices, searchTraces, fetchCRISPAnalysis } = bindActionCreators(
     jaegerApiActions,
     dispatch
   );
@@ -282,6 +307,7 @@ function mapDispatchToProps(dispatch) {
   return {
     cohortAddTrace,
     cohortRemoveTrace,
+    fetchCRISPAnalysis,
     fetchMultipleTraces,
     fetchServiceOperations,
     fetchServices,

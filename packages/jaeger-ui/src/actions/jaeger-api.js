@@ -105,3 +105,8 @@ export const fetchAggregatedServiceMetrics = createAction(
     ]);
   }
 );
+
+export const fetchCRISPAnalysis = createAction(
+  '@JAEGER_API/FETCH_CRISP_ANALYSIS',
+  (serviceName, operationName, traces) => JaegerAPI.fetchCRISPAnalysis(serviceName, operationName, traces),
+)
