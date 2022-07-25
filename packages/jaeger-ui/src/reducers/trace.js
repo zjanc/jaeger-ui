@@ -152,16 +152,19 @@ function loadJsonErred(state, { payload }) {
 }
 
 function fetchCRISPStarted(state) {
-  return state;
+  const crispLoading = true;
+  return { ...state, crispLoading };
 }
 
 function fetchCRISPDone(state, { payload }) {
   const crispRaw = payload;
-  return { ...state, crispRaw }
+  const crispLoading = false;
+  return { ...state, crispRaw, crispLoading }
 }
 
 function fetchCRISPErred(state) {
-  return state;
+  const crispLoading = true;
+  return { ...state, crispLoading };
 }
 
 export default handleActions(

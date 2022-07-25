@@ -91,6 +91,7 @@ export class SearchTracePageImpl extends Component {
 
   render() {
     const {
+      crispLoading,
       crispRaw,
       cohortAddTrace,
       cohortRemoveTrace,
@@ -111,6 +112,7 @@ export class SearchTracePageImpl extends Component {
     const hasCRISPReport = crispRaw;
     const showErrors = errors && !loadingTraces;
     const showLogo = isHomepage && !hasTraceResults && !loadingTraces && !errors;
+    const hideCRISP = showLogo || crispLoading || loadingTraces;
 
     const flameGraphEnabled = true;
     const heatmapEnabled = false;
@@ -136,13 +138,13 @@ export class SearchTracePageImpl extends Component {
           </Col>
         )}
         <Col span={!embedded ? 18 : 24} className="SearchTracePage--column">
-          {hasCRISPReport && flameGraphEnabled && (
+          {hasCRISPReport && flameGraphEnabled && !hideCRISP && (
             <div dangerouslySetInnerHTML={{ __html: crispRaw.flameGraph.replace("/\\n/g", "") }} className="flame-graph" />
           )}
-          {hasCRISPReport && heatmapEnabled && (
+          {hasCRISPReport && heatmapEnabled && !hideCRISP && (
             <div dangerouslySetInnerHTML={{ __html: crispRaw.heatmap.replace("/\\n/g", "") }} />
           )}
-          {hasCRISPReport && summaryEnabled && (
+          {hasCRISPReport && summaryEnabled && !hideCRISP && (
             <div dangerouslySetInnerHTML={{ __html: crispRaw.summary.replace("/\\n/g", "") }} />
           )}
           {showErrors && (
@@ -185,6 +187,7 @@ export class SearchTracePageImpl extends Component {
 }
 SearchTracePageImpl.propTypes = {
   isHomepage: PropTypes.bool,
+  crispLoading: PropTypes.bool,
   // eslint-disable-next-line react/forbid-prop-types
   crispRaw: PropTypes.object,
   // eslint-disable-next-line react/forbid-prop-types
@@ -274,6 +277,7 @@ export function mapStateToProps(state) {
   const { embedded, router, services: stServices, traceDiff, trace } = state;
   const rawTraces = trace.rawTraces;
   const crispRaw = trace.crispRaw;
+  const crispLoading = trace.crispLoading;
   const query = getUrlState(router.location.search);
   const isHomepage = !Object.keys(query).length;
   const { query: queryOfResults, traces, maxDuration, traceError, loadingTraces } = stateTraceXformer(
@@ -291,6 +295,7 @@ export function mapStateToProps(state) {
   const sortBy = sortFormSelector(state, 'sortBy');
   const traceResults = sortedTracesXformer(traces, sortBy);
   return {
+    crispLoading,
     crispRaw,
     queryOfResults,
     diffCohort,
