@@ -115,7 +115,7 @@ export class SearchTracePageImpl extends Component {
     const hideCRISP = showLogo || crispLoading || loadingTraces;
 
     const flameGraphEnabled = true;
-    const heatmapEnabled = false;
+    const heatmapEnabled = true;
     const summaryEnabled = false;
     return (
       <Row className="SearchTracePage--row">
@@ -142,10 +142,10 @@ export class SearchTracePageImpl extends Component {
             <div dangerouslySetInnerHTML={{ __html: crispRaw.flameGraph.replace("/\\n/g", "") }} className="flame-graph" />
           )}
           {hasCRISPReport && heatmapEnabled && !hideCRISP && (
-            <div dangerouslySetInnerHTML={{ __html: crispRaw.heatmap.replace("/\\n/g", "") }} />
+            <div dangerouslySetInnerHTML={{ __html: crispRaw.heatmap.replace("/\\n/g", "") }} className="crisp-heatmap" />
           )}
           {hasCRISPReport && summaryEnabled && !hideCRISP && (
-            <div dangerouslySetInnerHTML={{ __html: crispRaw.summary.replace("/\\n/g", "") }} />
+            <div dangerouslySetInnerHTML={{ __html: crispRaw.summary.replace("/\\n/g", "") }} className="crisp-summary" />
           )}
           {showErrors && (
             <div className="js-test-error-message">

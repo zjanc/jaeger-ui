@@ -13,6 +13,7 @@ import reduxFormFieldAdapter from '../../../utils/redux-form-field-adapter';
 import VirtSelect from '../../common/VirtSelect';
 import { bindActionCreators, Dispatch } from 'redux';
 
+import './index.css';
 import * as jaegerApiActions from '../../../actions/jaeger-api';
 
 type StateType = {};
@@ -26,6 +27,7 @@ type TReduxProps = {
 type TDispatchProps = {
   fetchServices: ActionFunction<Action<Promise<any>>>;
   fetchServiceOperations: (serviceName: string) => void;
+  fetchCRISPAnalysis: (serviceName: string, operationName: string) => void;
 };
 
 type TProps = TReduxProps & TDispatchProps;
@@ -48,9 +50,12 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
   }
 
   componentDidUpdate(prevProps: TProps) {
-    const { fetchServiceOperations, selectedService } = this.props;
+    const { fetchServiceOperations, selectedService, selectedOperation } = this.props;
     if (selectedService && prevProps.selectedService !== selectedService) {
       fetchServiceOperations(selectedService);
+    }
+    if (selectedOperation && (prevProps.selectedOperation !== selectedOperation || prevProps.selectedService !== selectedService)) {
+
     }
   }
 
@@ -74,7 +79,7 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
         <div className="critical-path-container">
           <Row>
             <Col span={16}>
-              <h1>Critical Path page for {selectedService} / {selectedOperation}</h1>
+              <h1>Critical Path Analysis for {selectedService} / {selectedOperation}</h1>
             </Col>
           </Row>
 
@@ -82,7 +87,6 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
             <Col span={6}>
               <h2 className="service-selector-header">Choose service</h2>
               <Field
-                // onChange={(e: Event, newValue: string) => trackSelectService(newValue)}
                 name="service"
                 component={AdaptedVirtualSelect}
                 placeholder="Select A Service"
@@ -96,15 +100,17 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
                 }}
               />
             </Col>
+          </Row>
+
+          <Row>
             <Col span={6}>
               <h2 className="operation-selector-header">Choose operation</h2>
               <Field
-                // onChange={(e: Event, newValue: string) => trackSearchOperation(newValue)}
                 name="operation"
                 component={AdaptedVirtualSelect}
                 placeholder="Select an Operation"
                 props={{
-                  className: 'select-a-operation-input',
+                  className: 'select-operation-input',
                   value: this.getSelectedOperation(),
                   disabled: servicesLoading,
                   clearable: false,
@@ -112,6 +118,12 @@ export class CriticalPathViewImpl extends React.PureComponent<TProps, StateType>
                   required: true,
                 }}
               />
+            </Col>
+          </Row>
+
+          <Row>
+            <Col span={16}>
+              <h3>Critical Path Data</h3>
             </Col>
           </Row>
 
@@ -133,7 +145,7 @@ export function mapStateToProps(state: ReduxState): TReduxProps {
 }
 
 export function mapDispatchToProps(dispatch: Dispatch<ReduxState>): TDispatchProps {
-  const { fetchServices, fetchServiceOperations } = bindActionCreators<any>(
+  const { fetchServices, fetchServiceOperations, fetchCRISPAnalysis } = bindActionCreators<any>(
     jaegerApiActions,
     dispatch
   );
@@ -141,6 +153,7 @@ export function mapDispatchToProps(dispatch: Dispatch<ReduxState>): TDispatchPro
   return {
     fetchServices,
     fetchServiceOperations,
+    fetchCRISPAnalysis,
   }
 }
 
